@@ -4,7 +4,7 @@ class Edge {
         this.vertexTwo = vertexTwo;
     }
     getTangent() {
-        return this.vertexOne.getSubtract(this.vertexTwo);
+        return this.vertexTwo.getSubtract(this.vertexOne);
     }
     getNormalizedTangent() {
         return this.getTangent().getNormalized();

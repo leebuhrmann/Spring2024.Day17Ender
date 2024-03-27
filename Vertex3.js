@@ -6,19 +6,20 @@ class Vertex3 {
     return new Vertex3(this.x, this.y, this.z);
   }
   getSubtract(other) {
-      return new Vertex2(other.x - this.x, other.y - this.y, this.z - other.z);
+      return new Vertex3(this.x - other.x, this.y - other.y, this.z - other.z);
+    //   return new Vertex2(this.x - other.x, this.y - other.y, this.z - other.z);
   }
   getAdd(other) {
-      return new Vertex2(this.x + other.x, this.y + other.y, this.z - other.z);
+      return new Vertex3(this.x + other.x, this.y + other.y, this.z - other.z);
   }
   getScaled(scalar) {
-      return new Vertex2(this.x * scalar, this.y * scalar, this.z * scalar);
+      return new Vertex3(this.x * scalar, this.y * scalar, this.z * scalar);
   }
   getLength() {
       return Math.sqrt(this.x ** 2 + this.y ** 2 + this.z**3);
   }
   getNormalized() {
-      return new Vertex2(this.x / this.getLength(), this.y / this.getLength(), this.z/this.getLength());
+      return new Vertex3(this.x / this.getLength(), this.y / this.getLength(), this.z/this.getLength());
   }
   
   getDot(other) {

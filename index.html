@@ -117,12 +117,12 @@
                 zBuffer.push(col)
             }
 
-           
 
-            
+
+
             for (let index = 0; index < 12; index++) {
 
-                if(index != 1) continue;
+                // if (index != 1) continue;
                 //let index = 1;
                 // if(index > 2) continue;
 
@@ -145,22 +145,27 @@
                 out = fun(three.x, three.z, angle)
                 three.x = out.x;
                 three.z = out.y;
-                
+
+                let twoOne = two.getSubtract(one);
+                let threeOne = three.getSubtract(one);
+                let cross = twoOne.getCross(threeOne);
+                if (cross.z < 0)
+                    continue;
 
 
-                // let v1 = new Vertex2(10, 10);
-                // let v2 = new Vertex2(30, 90);
 
                 let a = new Vertex2(one.x, one.y);
                 let b = new Vertex2(two.x, two.y);
                 let c = new Vertex2(three.x, three.y);
 
-                // let e1 = new Edge(a, b);
-                // let e2 = new Edge(b, c);
-                // let e3 = new Edge(c, a);
-                let e1 = new Edge(one, two);
-                let e2 = new Edge(two, three);
-                let e3 = new Edge(three, one);
+                let e1 = new Edge(a, b);
+                let e2 = new Edge(b, c);
+                let e3 = new Edge(c, a);
+
+                // let e1 = new Edge(one, two);
+                // let e2 = new Edge(two, three);
+                // let e3 = new Edge(three, one);
+
                 let pixels1 = e1.getPixels();
                 let pixels2 = e2.getPixels();
                 let pixels3 = e3.getPixels();
