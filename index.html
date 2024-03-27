@@ -14,177 +14,17 @@
     <canvas id="canv">
 
     </canvas>
+    <script src="Vertex2.js"></script>
+    <script src="Vertex3.js"></script>
+    <script src="Pixel.js"></script>
+    <script src="Edge.js"></script>
+    <script src="Triangle.js"></script>
+    <script src="obj.js"></script>
     <script>
-
-        let obj = `v 1.000000 1.000000 -1.000000
-v 1.000000 -1.000000 -1.000000
-v 1.000000 1.000000 1.000000
-v 1.000000 -1.000000 1.000000
-v -1.000000 1.000000 -1.000000
-v -1.000000 -1.000000 -1.000000
-v -1.000000 1.000000 1.000000
-v -1.000000 -1.000000 1.000000
-vn -0.0000 1.0000 -0.0000
-vn -0.0000 -0.0000 1.0000
-vn -1.0000 -0.0000 -0.0000
-vn -0.0000 -1.0000 -0.0000
-vn 1.0000 -0.0000 -0.0000
-vn -0.0000 -0.0000 -1.0000
-vt 0.625000 0.500000
-vt 0.375000 0.500000
-vt 0.625000 0.750000
-vt 0.375000 0.750000
-vt 0.875000 0.500000
-vt 0.625000 0.250000
-vt 0.125000 0.500000
-vt 0.375000 0.250000
-vt 0.875000 0.750000
-vt 0.625000 1.000000
-vt 0.625000 0.000000
-vt 0.375000 0.000000
-vt 0.375000 1.000000
-vt 0.125000 0.750000
-f 5/5/1 3/3/1 1/1/1
-f 3/3/2 8/13/2 4/4/2
-f 7/11/3 6/8/3 8/12/3
-f 2/2/4 8/14/4 6/7/4
-f 1/1/5 4/4/5 2/2/5
-f 5/6/6 2/2/6 6/8/6
-f 5/5/1 7/9/1 3/3/1
-f 3/3/2 7/10/2 8/13/2
-f 7/11/3 5/6/3 6/8/3
-f 2/2/4 4/4/4 8/14/4
-f 1/1/5 3/3/5 4/4/5
-f 5/6/6 1/1/6 2/2/6`
-
-
-
-
-
         let canvas = document.querySelector("#canv");
         let ctx = canvas.getContext("2d")
         ctx.fillStyle = "red"
         ctx.fillRect(0, 0, 100, 100)
-
-        class Pixel {
-            constructor(x, y, r, g, b) {
-                this.x = x;
-                this.y = y;
-                this.r = r;
-                this.g = g;
-                this.b = b;
-            }
-        }
-
-        class Vertex3 {
-            constructor(x, y, z) {
-                [this.x, this.y, this.z] = [x, y, z]
-            }
-        }
-
-        class Vertex2 {
-            constructor(x, y) {
-                this.x = x
-                this.y = y
-            }
-            getSubtract(other) {
-                return new Vertex2(other.x - this.x, other.y - this.y);
-            }
-            getAdd(other) {
-                return new Vertex2(other.x + this.x, other.y + this.y);
-            }
-            getScaled(scalar) {
-                return new Vertex2(this.x * scalar, this.y * scalar);
-            }
-            getLength() {
-                return Math.sqrt(this.x ** 2 + this.y ** 2);
-            }
-            getNormalized() {
-                return new Vertex2(this.x / this.getLength(), this.y / this.getLength());
-            }
-            getPerpendicular() {
-                return new Vertex2(-this.y, this.x);
-            }
-            getDot(other) {
-                return this.x * other.x + this.y * other.y;
-            }
-        }
-
-        class Edge {
-            constructor(vertexOne, vertexTwo) {
-                this.vertexOne = vertexOne;
-                this.vertexTwo = vertexTwo;
-            }
-            getTangent() {
-                return this.vertexOne.getSubtract(this.vertexTwo);
-            }
-            getNormalizedTangent() {
-                return this.getTangent().getNormalized();
-            }
-            getPerpendicular() {
-                return this.getNormalizedTangent().getPerpendicular();
-            }
-            getABC() {
-                let AB = this.getPerpendicular();
-                let dot = AB.getDot(this.vertexOne);
-                let C = -dot;
-                return { A: AB.x, B: AB.y, C }
-            }
-            getPixels() {
-
-                let startX = this.vertexOne.x;
-                let startY = this.vertexOne.y;
-                let endX = this.vertexTwo.x;
-                let endY = this.vertexTwo.y;
-
-                let toReturn = [];
-
-                let tangent = this.getNormalizedTangent();
-                let absX = Math.abs(tangent.x)
-                let absY = Math.abs(tangent.y)
-                let m = Math.max(absX, absY);
-                let inverse = 1 / m;
-                let offTangent = new Vertex2(tangent.x * inverse, tangent.y * inverse)
-                let steps = this.getTangent().getLength() / offTangent.getLength();
-
-                let x = startX;
-                let y = startY;
-
-                let count = 0;
-                while (count < steps) {
-                    count++;
-                    toReturn.push(new Pixel(Math.round(x), Math.round(y), 255, 255, 255));
-                    x += offTangent.x;
-                    y += offTangent.y;
-
-                }
-
-
-                // for(let x = startX; x <= endX; x++){
-                //     for(let y = startY; y < endY; y++){
-                //         toReturn.push(new Pixel(x,y, 255,255,255))
-                //     }
-                // }
-
-
-                return toReturn;
-            }
-        }
-
-
-
-
-
-        /**
-         * This has to be counter clockwise
-         */
-        class Triangle {
-            constructor(vertexOne, vertexTwo, vertexThree) {
-                this.vertexOne = vertexOne
-                this.vertexTwo = vertexTwo
-                this.vertexThree = vertexThree
-            }
-        }
 
         let lines = obj.split("\n")
         let vs = []
@@ -196,21 +36,22 @@ f 5/6/6 1/1/6 2/2/6`
             let split = lines[i].trim().split(" ")
             if (split[0] == "v") {
                 let x = +split[1]
-                let y = +split[1]
-                let z = +split[1]
-                let v = new Vertex3(x, y, z)
+                let y = +split[2]
+                let z = +split[3]
+                // let v = new Vertex3(x , y , z)
+                let v = new Vertex3(x * 30 + 50, y * 30 + 50, z * 30 + 50)
                 vs.push(v)
             }
             if (split[0] == "vn") {
                 let x = +split[1]
-                let y = +split[1]
-                let z = +split[1]
+                let y = +split[2]
+                let z = +split[3]
                 let vn = new Vertex3(x, y, z)
                 vns.push(vn)
             }
             if (split[0] == "vt") {
                 let u = +split[1]
-                let v = +split[1]
+                let v = +split[2]
                 let vt = new Vertex2(u, v)
                 vts.push(vt)
             }
@@ -222,9 +63,9 @@ f 5/6/6 1/1/6 2/2/6`
                 let points = []
                 for (let i = 0; i < 3; i++) {
                     let group = groups[i].split("/")
-                    let vIndex = +group[0]-1
-                    let vnIndex = +group[1]-1
-                    let vtIndex = +group[2]-1
+                    let vIndex = +group[0] - 1
+                    let vnIndex = +group[1] - 1
+                    let vtIndex = +group[2] - 1
 
                     let v = vs[vIndex]
                     let vn = vns[vnIndex]
@@ -239,19 +80,12 @@ f 5/6/6 1/1/6 2/2/6`
         }
 
 
-
         let zBuffer = []
 
-        let bufferWidth = 100
+        let bufferWidth = 200
         let bufferHeight = 100
 
-        for (let x = 0; x < bufferWidth; x++) {
-            let col = []
-            for (let y = 0; y < bufferHeight; y++) {
-                col.push(new Pixel(x, y, 0, 0, 0))
-            }
-            zBuffer.push(col)
-        }
+
 
 
 
@@ -261,43 +95,106 @@ f 5/6/6 1/1/6 2/2/6`
         // let two = new Vertex2(30, 90);
         // let three = new Vertex2(80, 10);
 
-        let one = triangles[0].vertexOne
-        let two = triangles[0].vertexTw
-        let three = triangles[0].vertexThree
-
-        // let v1 = new Vertex2(10, 10);
-        // let v2 = new Vertex2(30, 90);
-        let e1 = new Edge(one, two);
-        let e2 = new Edge(two, three);
-        let e3 = new Edge(three, one);
-        let pixels1 = e1.getPixels();
-        let pixels2 = e2.getPixels();
-        let pixels3 = e3.getPixels();
-
-        for (let pixel of pixels1) {
-            zBuffer[pixel.x][pixel.y] = pixel;
-        }
-        for (let pixel of pixels2) {
-            zBuffer[pixel.x][pixel.y] = pixel;
-        }
-        for (let pixel of pixels3) {
-            zBuffer[pixel.x][pixel.y] = pixel;
+        function fun(x, y, angle) {
+            let _x = 50 - x
+            let _y = y;
+            let _r = Math.sqrt(_x ** 2 + _y ** 2)
+            let _tan = Math.atan2(_y, _x);
+            let _angle = _tan + angle;
+            let _x2 = Math.cos(_angle) * _r;
+            let _y2 = Math.sin(_angle) * _r;
+            return { x: _x2 + 50, y: _y2 }
         }
 
-
-
-
-
-
-        // Draw the buffer
-
-        for (let x = 0; x < bufferWidth; x++) {
-            for (let y = 0; y < bufferHeight; y++) {
-                let pixel = zBuffer[x][y]
-                ctx.fillStyle = `rgb(${pixel.r},${pixel.g},${pixel.b})`;
-                ctx.fillRect(pixel.x, pixel.y, 1, 1)
+        let tick = 0;
+        function render() {
+            zBuffer = [];
+            for (let x = 0; x < bufferWidth; x++) {
+                let col = []
+                for (let y = 0; y < bufferHeight; y++) {
+                    col.push(new Pixel(x, y, 0, 0, 0))
+                }
+                zBuffer.push(col)
             }
+
+           
+
+            
+            for (let index = 0; index < 12; index++) {
+
+                // let index = 1;
+                if(index > 2) continue;
+
+
+
+
+                let one = triangles[index].vertexOne.getClone()
+                let two = triangles[index].vertexTwo.getClone()
+                let three = triangles[index].vertexThree.getClone()
+
+                let angle = tick / 100
+                let out = fun(one.x, one.z, angle);
+                one.x = out.x;
+                one.z = out.y;
+
+                out = fun(two.x, two.z, angle);
+                two.x = out.x;
+                two.z = out.y;
+
+                out = fun(three.x, three.y, angle)
+                three.x = out.x;
+                three.z = out.z;
+
+
+                // let v1 = new Vertex2(10, 10);
+                // let v2 = new Vertex2(30, 90);
+
+
+                let e1 = new Edge(one, two);
+                let e2 = new Edge(two, three);
+                let e3 = new Edge(three, one);
+                let pixels1 = e1.getPixels();
+                let pixels2 = e2.getPixels();
+                let pixels3 = e3.getPixels();
+
+
+
+                for (let pixel of pixels1) {
+                    let x = Math.max(0, pixel.x);
+                    let y = Math.max(0, pixel.y);
+                    zBuffer[x][y] = pixel;
+                }
+                for (let pixel of pixels2) {
+                    let x = Math.max(0, pixel.x);
+                    let y = Math.max(0, pixel.y);
+                    zBuffer[x][y] = pixel;
+                }
+                for (let pixel of pixels3) {
+                    let x = Math.max(0, pixel.x);
+                    let y = Math.max(0, pixel.y);
+                    zBuffer[x][y] = pixel;
+                }
+
+
+
+
+            }
+
+            // Draw the buffer
+
+            for (let x = 0; x < bufferWidth; x++) {
+                for (let y = 0; y < bufferHeight; y++) {
+                    let pixel = zBuffer[x][y]
+                    ctx.fillStyle = `rgb(${pixel.r},${pixel.g},${pixel.b})`;
+                    ctx.fillRect(pixel.x, pixel.y, 1, 1)
+                }
+            }
+
+
+            tick++;
         }
+
+        setInterval(render, 100)
 
 
 
