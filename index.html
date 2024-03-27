@@ -39,7 +39,7 @@
                 let y = +split[2]
                 let z = +split[3]
                 // let v = new Vertex3(x , y , z)
-                let v = new Vertex3(x * 30 + 50, y * 30 + 50, z * 30 + 50)
+                let v = new Vertex3(x * 30 + 50, y * 30 + 50, z * 30)
                 vs.push(v)
             }
             if (split[0] == "vn") {
@@ -96,7 +96,7 @@
         // let three = new Vertex2(80, 10);
 
         function fun(x, y, angle) {
-            let _x = 50 - x
+            let _x = x - 50
             let _y = y;
             let _r = Math.sqrt(_x ** 2 + _y ** 2)
             let _tan = Math.atan2(_y, _x);
@@ -122,8 +122,9 @@
             
             for (let index = 0; index < 12; index++) {
 
-                // let index = 1;
-                if(index > 2) continue;
+                if(index != 1) continue;
+                //let index = 1;
+                // if(index > 2) continue;
 
 
 
@@ -132,7 +133,7 @@
                 let two = triangles[index].vertexTwo.getClone()
                 let three = triangles[index].vertexThree.getClone()
 
-                let angle = tick / 100
+                let angle = tick / 10
                 let out = fun(one.x, one.z, angle);
                 one.x = out.x;
                 one.z = out.y;
@@ -141,15 +142,22 @@
                 two.x = out.x;
                 two.z = out.y;
 
-                out = fun(three.x, three.y, angle)
+                out = fun(three.x, three.z, angle)
                 three.x = out.x;
-                three.z = out.z;
+                three.z = out.y;
+                
 
 
                 // let v1 = new Vertex2(10, 10);
                 // let v2 = new Vertex2(30, 90);
 
+                let a = new Vertex2(one.x, one.y);
+                let b = new Vertex2(two.x, two.y);
+                let c = new Vertex2(three.x, three.y);
 
+                // let e1 = new Edge(a, b);
+                // let e2 = new Edge(b, c);
+                // let e3 = new Edge(c, a);
                 let e1 = new Edge(one, two);
                 let e2 = new Edge(two, three);
                 let e3 = new Edge(three, one);
