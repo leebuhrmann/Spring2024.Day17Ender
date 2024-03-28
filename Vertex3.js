@@ -16,7 +16,7 @@ class Vertex3 {
       return new Vertex3(this.x * scalar, this.y * scalar, this.z * scalar);
   }
   getLength() {
-      return Math.sqrt(this.x ** 2 + this.y ** 2 + this.z**3);
+      return Math.sqrt(this.x ** 2 + this.y ** 2 + this.z**2);
   }
   getNormalized() {
       return new Vertex3(this.x / this.getLength(), this.y / this.getLength(), this.z/this.getLength());

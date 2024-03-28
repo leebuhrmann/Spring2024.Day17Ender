@@ -23,7 +23,7 @@
 
   <!-- Uncomment to use a specific model -->
   <!-- <script src="cube.js"></script> -->
-  <!--<script src="sphere.js"></script> -->
+  <!-- <script src="sphere.js"></script> -->
   <script src="monkey.js"></script>
 
 
@@ -117,7 +117,7 @@
      * Render the obj to the screen
      */
     function render() {
-      
+
       let usePerspective = true;
       let useBackFaceCulling = true;
       let useOneTriangle = false;
@@ -188,11 +188,13 @@
           }
         }
 
+
+        let twoOne = two.getSubtract(one);
+        let threeOne = three.getSubtract(one);
+        let cross = twoOne.getCross(threeOne).getNormalized();
+        let normal = cross.getNormalized();
         if (useBackFaceCulling) {
-          let twoOne = two.getSubtract(one);
-          let threeOne = three.getSubtract(one);
-          let cross = twoOne.getCross(threeOne);
-          if (cross.z < 0)
+          if (normal.z < 0)
             continue;
         }
 
@@ -212,24 +214,46 @@
         let pixels3 = e3.getPixels();
 
         let allEdgePixels = [...pixels1, ...pixels2, ...pixels3]
-        let minY = Math.min(...allEdgePixels.map(p=>p.y));
-        let maxY = Math.max(...allEdgePixels.map(p=>p.y));
-        console.log(minY)
-        console.log(maxY)
-        for(let y = minY; y <= maxY; y++){
-          let matching = allEdgePixels.filter(p=>p.y == y);
-          let minX = Math.min(...matching.map(p=>p.x))
-          let maxX = Math.max(...matching.map(p=>p.x))
-          for(let x = minX; x <= maxX; x++){
-            zBuffer[x][y] = new Pixel(x,y,255,255,255)
+        let minY = Math.min(...allEdgePixels.map(p => p.y));
+        let maxY = Math.max(...allEdgePixels.map(p => p.y));
+
+
+        for (let y = minY; y <= maxY; y++) {
+          let matching = allEdgePixels.filter(p => p.y == y);
+          let minX = Math.min(...matching.map(p => p.x))
+          let maxX = Math.max(...matching.map(p => p.x))
+          for (let x = minX; x <= maxX; x++) {
+
+            //Now calculate the color
+            let toSun = new Vertex3(1,0,1).getNormalized();
+            let diffuse = normal.getDot(toSun);
+            diffuse = Math.max(0, diffuse)
+            let r = 255;
+            let g = 255;
+            let b = 255;
+
+            r *= diffuse
+            g *= diffuse;
+            b *= diffuse
+
+            let ambient = 50;
+            r += ambient;
+            g += ambient;
+            b += ambient;
+
+            r = Math.max(0, Math.min(255, r))
+            g = Math.max(0, Math.min(255, g))
+            b = Math.max(0, Math.min(255, b))
+
+            zBuffer[x][y] = new Pixel(x, y, r, g, b)
           }
         }
 
-        for(let pixel of allEdgePixels){
-          let x = Math.max(0, pixel.x);
-          let y = Math.max(0, pixel.y);
-          zBuffer[x][y] = pixel
-        }
+        // for (let pixel of allEdgePixels) {
+        //   let x = Math.max(0, pixel.x);
+        //   let y = Math.max(0, pixel.y);
+        //   zBuffer[x][y] = pixel
+        // }
 
 
 
@@ -270,10 +294,10 @@
 
     let tick = 0;
 
-    if(useAnimation){
+    if (useAnimation) {
       setInterval(render, 100)
     }
-    else{
+    else {
       render()
     }
 
