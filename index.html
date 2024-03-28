@@ -19,7 +19,7 @@
   <script src="Pixel.js"></script>
   <script src="Edge.js"></script>
   <script src="Triangle.js"></script>
-  <script src="obj.js"></script>
+  <script src="monkey.js"></script>
   <script>
     let canvas = document.querySelector("#canv");
     let ctx = canvas.getContext("2d")
@@ -85,17 +85,7 @@
     let bufferWidth = 100
     let bufferHeight = 100
 
-
-
-
-
-    //Magic
-
-    // let one = new Vertex2(10, 10);
-    // let two = new Vertex2(30, 90);
-    // let three = new Vertex2(80, 10);
-
-    function fun(x, y, angle) {
+    function rotate(x, y, angle) {
       let _x = x - 50
       let _y = y;
       let _r = Math.sqrt(_x ** 2 + _y ** 2)
@@ -120,29 +110,24 @@
 
 
 
-      for (let index = 0; index < 12; index++) {
+      for (let index = 0; index < triangles.length; index++) {
 
         // if (index != 1) continue;
-        //let index = 1;
-        // if(index > 2) continue;
-
-
-
 
         let one = triangles[index].vertexOne.getClone()
         let two = triangles[index].vertexTwo.getClone()
         let three = triangles[index].vertexThree.getClone()
 
         let angle = tick / 10
-        let out = fun(one.x, one.z, angle);
+        let out = rotate(one.x, one.z, angle);
         one.x = out.x;
         one.z = out.y;
 
-        out = fun(two.x, two.z, angle);
+        out = rotate(two.x, two.z, angle);
         two.x = out.x;
         two.z = out.y;
 
-        out = fun(three.x, three.z, angle)
+        out = rotate(three.x, three.z, angle)
         three.x = out.x;
         three.z = out.y;
 
