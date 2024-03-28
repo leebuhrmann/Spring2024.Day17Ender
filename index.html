@@ -30,9 +30,16 @@
   <script>
     //Get a reference to the canvas we will draw to
     let canvas = document.querySelector("#canv");
+
+    let bufferSize = 200;
+    let scaleFactor = bufferSize/4;
+    canvas.width = bufferSize;
+    canvas.height = bufferSize
     let ctx = canvas.getContext("2d")
     ctx.fillStyle = "red"
     ctx.fillRect(0, 0, 100, 100)
+
+    
 
     //Start parsing the obj file
     let lines = obj.split("\n")
@@ -50,7 +57,7 @@
 
         //We are scaling and shifting so our model is in the middle of the canvas
         // let v = new Vertex3(x , y , z)
-        let v = new Vertex3(x * 30 + 50, y * 30 + 50, z * 30)
+        let v = new Vertex3(x * scaleFactor + bufferSize/2, y * scaleFactor + bufferSize/2, z * scaleFactor)
         vs.push(v)
       }
       if (split[0] == "vn") {//Handle normal information
@@ -94,18 +101,18 @@
 
     let zBuffer = []
 
-    let bufferWidth = 100
-    let bufferHeight = 100
+    let bufferWidth = bufferSize
+    let bufferHeight = bufferSize
 
     function rotate(x, y, angle) {
-      let _x = x - 50
+      let _x = x - bufferSize/2
       let _y = y;
       let _r = Math.sqrt(_x ** 2 + _y ** 2)
       let _tan = Math.atan2(_y, _x);
       let _angle = _tan + angle;
       let _x2 = Math.cos(_angle) * _r;
       let _y2 = Math.sin(_angle) * _r;
-      return { x: _x2 + 50, y: _y2 }
+      return { x: _x2 + bufferSize/2, y: _y2 }
     }
 
 
@@ -127,7 +134,7 @@
       for (let x = 0; x < bufferWidth; x++) {
         let col = []
         for (let y = 0; y < bufferHeight; y++) {
-          col.push(new Pixel(x, y, 0, 0, 0))
+          col.push(new Pixel(x, y, 0, 0, 0, 1000))
         }
         zBuffer.push(col)
       }
@@ -165,8 +172,8 @@
 
 
         //Setup the camera information for perspective calculations
-        let cameraFromZ = 85
-        let cameraToZ = 35
+        let cameraFromZ = bufferSize/2 + bufferSize/8 +5
+        let cameraToZ = bufferSize/8+5
         let cameraLengthZ = cameraFromZ - cameraToZ
 
         //Track the points once we do perspective
@@ -176,15 +183,15 @@
         if (usePerspective) {
           for (const point of points) {
             let distanceZ = cameraFromZ - point.z
-            let offsetX = point.x - 50;
+            let offsetX = point.x - bufferSize/2;
             let ratioX = offsetX / distanceZ;
             let newValueX = ratioX * cameraLengthZ;
-            point.x = newValueX + 50
+            point.x = newValueX + bufferSize/2
 
-            let offsetY = point.y - 50;
+            let offsetY = point.y - bufferSize/2;
             let ratioY = offsetY / distanceZ;
             let newValueY = ratioY * cameraLengthZ;
-            point.y = newValueY + 50
+            point.y = newValueY + bufferSize/2
           }
         }
 
