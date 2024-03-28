@@ -22,9 +22,9 @@
   <script src="Triangle.js"></script>
 
   <!-- Uncomment to use a specific model -->
-  <script src="cube.js"></script>
+  <!-- <script src="cube.js"></script> -->
   <!--<script src="sphere.js"></script> -->
-  <!-- <script src="monkey.js"></script> -->
+  <script src="monkey.js"></script>
 
 
   <script>
@@ -111,16 +111,16 @@
 
 
 
-    let useAnimation = false;
+    let useAnimation = true;
 
     /**
      * Render the obj to the screen
      */
     function render() {
       
-      let usePerspective = false;
-      let useBackFaceCulling = false;
-      let useOneTriangle = true;
+      let usePerspective = true;
+      let useBackFaceCulling = true;
+      let useOneTriangle = false;
 
       //First clear the zBuffer
       zBuffer = [];
@@ -211,21 +211,43 @@
         let pixels2 = e2.getPixels();
         let pixels3 = e3.getPixels();
 
-        for (let pixel of pixels1) {
+        let allEdgePixels = [...pixels1, ...pixels2, ...pixels3]
+        let minY = Math.min(...allEdgePixels.map(p=>p.y));
+        let maxY = Math.max(...allEdgePixels.map(p=>p.y));
+        console.log(minY)
+        console.log(maxY)
+        for(let y = minY; y <= maxY; y++){
+          let matching = allEdgePixels.filter(p=>p.y == y);
+          let minX = Math.min(...matching.map(p=>p.x))
+          let maxX = Math.max(...matching.map(p=>p.x))
+          for(let x = minX; x <= maxX; x++){
+            zBuffer[x][y] = new Pixel(x,y,255,255,255)
+          }
+        }
+
+        for(let pixel of allEdgePixels){
           let x = Math.max(0, pixel.x);
           let y = Math.max(0, pixel.y);
-          zBuffer[x][y] = pixel;
+          zBuffer[x][y] = pixel
         }
-        for (let pixel of pixels2) {
-          let x = Math.max(0, pixel.x);
-          let y = Math.max(0, pixel.y);
-          zBuffer[x][y] = pixel;
-        }
-        for (let pixel of pixels3) {
-          let x = Math.max(0, pixel.x);
-          let y = Math.max(0, pixel.y);
-          zBuffer[x][y] = pixel;
-        }
+
+
+
+        // for (let pixel of pixels1) {
+        //   let x = Math.max(0, pixel.x);
+        //   let y = Math.max(0, pixel.y);
+        //   zBuffer[x][y] = pixel;
+        // }
+        // for (let pixel of pixels2) {
+        //   let x = Math.max(0, pixel.x);
+        //   let y = Math.max(0, pixel.y);
+        //   zBuffer[x][y] = pixel;
+        // }
+        // for (let pixel of pixels3) {
+        //   let x = Math.max(0, pixel.x);
+        //   let y = Math.max(0, pixel.y);
+        //   zBuffer[x][y] = pixel;
+        // }
       }
 
       // Draw the buffer
