@@ -2,230 +2,251 @@
 <html>
 
 <head>
-    <title>Line Drawing</title>
-    <style>
-        * {
-            margin: 0;
-        }
-    </style>
+  <title>Line Drawing</title>
+  <style>
+    * {
+      margin: 0;
+    }
+  </style>
 </head>
 
-<body>
-    <canvas id="canv">
+<body style="background-color: gray;">
+  <canvas id="canv">
 
-    </canvas>
-    <script src="Vertex2.js"></script>
-    <script src="Vertex3.js"></script>
-    <script src="Pixel.js"></script>
-    <script src="Edge.js"></script>
-    <script src="Triangle.js"></script>
-    <script src="obj.js"></script>
-    <script>
-        let canvas = document.querySelector("#canv");
-        let ctx = canvas.getContext("2d")
-        ctx.fillStyle = "red"
-        ctx.fillRect(0, 0, 100, 100)
+  </canvas>
+  <script src="Vertex2.js"></script>
+  <script src="Vertex3.js"></script>
+  <script src="Pixel.js"></script>
+  <script src="Edge.js"></script>
+  <script src="Triangle.js"></script>
+  <script src="obj.js"></script>
+  <script>
+    let canvas = document.querySelector("#canv");
+    let ctx = canvas.getContext("2d")
+    ctx.fillStyle = "red"
+    ctx.fillRect(0, 0, 100, 100)
 
-        let lines = obj.split("\n")
-        let vs = []
-        let vns = []
-        let vts = []
-        let triangles = []
+    let lines = obj.split("\n")
+    let vs = []
+    let vns = []
+    let vts = []
+    let triangles = []
 
-        for (let i = 0; i < lines.length; i++) {
-            let split = lines[i].trim().split(" ")
-            if (split[0] == "v") {
-                let x = +split[1]
-                let y = +split[2]
-                let z = +split[3]
-                // let v = new Vertex3(x , y , z)
-                let v = new Vertex3(x * 30 + 50, y * 30 + 50, z * 30)
-                vs.push(v)
-            }
-            if (split[0] == "vn") {
-                let x = +split[1]
-                let y = +split[2]
-                let z = +split[3]
-                let vn = new Vertex3(x, y, z)
-                vns.push(vn)
-            }
-            if (split[0] == "vt") {
-                let u = +split[1]
-                let v = +split[2]
-                let vt = new Vertex2(u, v)
-                vts.push(vt)
-            }
-            if (split[0] == "f") {
-                let one = split[1]
-                let two = split[2]
-                let three = split[3]
-                let groups = [one, two, three]
-                let points = []
-                for (let i = 0; i < 3; i++) {
-                    let group = groups[i].split("/")
-                    let vIndex = +group[0] - 1
-                    let vnIndex = +group[1] - 1
-                    let vtIndex = +group[2] - 1
+    for (let i = 0; i < lines.length; i++) {
+      let split = lines[i].trim().split(" ")
+      if (split[0] == "v") {
+        let x = +split[1]
+        let y = +split[2]
+        let z = +split[3]
+        // let v = new Vertex3(x , y , z)
+        let v = new Vertex3(x * 30 + 50, y * 30 + 50, z * 30)
+        vs.push(v)
+      }
+      if (split[0] == "vn") {
+        let x = +split[1]
+        let y = +split[2]
+        let z = +split[3]
+        let vn = new Vertex3(x, y, z)
+        vns.push(vn)
+      }
+      if (split[0] == "vt") {
+        let u = +split[1]
+        let v = +split[2]
+        let vt = new Vertex2(u, v)
+        vts.push(vt)
+      }
+      if (split[0] == "f") {
+        let one = split[1]
+        let two = split[2]
+        let three = split[3]
+        let groups = [one, two, three]
+        let points = []
+        for (let i = 0; i < 3; i++) {
+          let group = groups[i].split("/")
+          let vIndex = +group[0] - 1
+          let vnIndex = +group[1] - 1
+          let vtIndex = +group[2] - 1
 
-                    let v = vs[vIndex]
-                    let vn = vns[vnIndex]
-                    let vt = vts[vtIndex]
+          let v = vs[vIndex]
+          let vn = vns[vnIndex]
+          let vt = vts[vtIndex]
 
-                    points.push(v)
-                }
+          points.push(v)
+        }
 
-                let triangle = new Triangle(points[0], points[1], points[2])
-                triangles.push(triangle)
-            }
+        let triangle = new Triangle(points[0], points[1], points[2])
+        triangles.push(triangle)
+      }
+    }
+
+
+    let zBuffer = []
+
+    let bufferWidth = 100
+    let bufferHeight = 100
+
+
+
+
+
+    //Magic
+
+    // let one = new Vertex2(10, 10);
+    // let two = new Vertex2(30, 90);
+    // let three = new Vertex2(80, 10);
+
+    function fun(x, y, angle) {
+      let _x = x - 50
+      let _y = y;
+      let _r = Math.sqrt(_x ** 2 + _y ** 2)
+      let _tan = Math.atan2(_y, _x);
+      let _angle = _tan + angle;
+      let _x2 = Math.cos(_angle) * _r;
+      let _y2 = Math.sin(_angle) * _r;
+      return { x: _x2 + 50, y: _y2 }
+    }
+
+    let tick = 0;
+    function render() {
+      zBuffer = [];
+      for (let x = 0; x < bufferWidth; x++) {
+        let col = []
+        for (let y = 0; y < bufferHeight; y++) {
+          col.push(new Pixel(x, y, 0, 0, 0))
+        }
+        zBuffer.push(col)
+      }
+
+
+
+
+      for (let index = 0; index < 12; index++) {
+
+        // if (index != 1) continue;
+        //let index = 1;
+        // if(index > 2) continue;
+
+
+
+
+        let one = triangles[index].vertexOne.getClone()
+        let two = triangles[index].vertexTwo.getClone()
+        let three = triangles[index].vertexThree.getClone()
+
+        let angle = tick / 10
+        let out = fun(one.x, one.z, angle);
+        one.x = out.x;
+        one.z = out.y;
+
+        out = fun(two.x, two.z, angle);
+        two.x = out.x;
+        two.z = out.y;
+
+        out = fun(three.x, three.z, angle)
+        three.x = out.x;
+        three.z = out.y;
+
+        
+
+        let cameraFromZ = 85
+        let cameraToZ = 35
+        let cameraLengthZ = cameraFromZ - cameraToZ
+
+        let points = [one, two, three];
+        for(const point of points){
+          let distanceZ = cameraFromZ-point.z
+          let offsetX = point.x - 50;
+          let ratioX = offsetX/distanceZ;
+          let newValueX = ratioX * cameraLengthZ;
+          point.x = newValueX + 50
+
+          let offsetY = point.y - 50;
+          let ratioY = offsetY/distanceZ;
+          let newValueY = ratioY * cameraLengthZ;
+          point.y = newValueY + 50
+        }
+
+        let twoOne = two.getSubtract(one);
+        let threeOne = three.getSubtract(one);
+        let cross = twoOne.getCross(threeOne);
+        if (cross.z < 0)
+          continue;
+
+
+
+        //Now account for perspective
+        // let _one = Math.abs(one.z-35);
+        // let _two = Math.abs(two.z - 35);
+        // let _three = Math.abs(three.z-35);
+        // one.x = (one.x - 50)/_one + 50
+        // one.y = (one.y - 50)/_one + 50
+        // two.x = (two.x - 50)/_two + 50
+        // two.y = (two.y - 50)/_two + 50
+        // three.x = (three.x - 50)/_three + 50
+        // three.y = (three.y - 50)/_three + 50
+
+
+
+        let a = new Vertex2(one.x, one.y);
+        let b = new Vertex2(two.x, two.y);
+        let c = new Vertex2(three.x, three.y);
+
+        let e1 = new Edge(a, b);
+        let e2 = new Edge(b, c);
+        let e3 = new Edge(c, a);
+
+        // let e1 = new Edge(one, two);
+        // let e2 = new Edge(two, three);
+        // let e3 = new Edge(three, one);
+
+        let pixels1 = e1.getPixels();
+        let pixels2 = e2.getPixels();
+        let pixels3 = e3.getPixels();
+
+
+
+        for (let pixel of pixels1) {
+          let x = Math.max(0, pixel.x);
+          let y = Math.max(0, pixel.y);
+          zBuffer[x][y] = pixel;
+        }
+        for (let pixel of pixels2) {
+          let x = Math.max(0, pixel.x);
+          let y = Math.max(0, pixel.y);
+          zBuffer[x][y] = pixel;
+        }
+        for (let pixel of pixels3) {
+          let x = Math.max(0, pixel.x);
+          let y = Math.max(0, pixel.y);
+          zBuffer[x][y] = pixel;
         }
 
 
-        let zBuffer = []
-
-        let bufferWidth = 200
-        let bufferHeight = 100
 
 
+      }
 
+      // Draw the buffer
 
-
-        //Magic
-
-        // let one = new Vertex2(10, 10);
-        // let two = new Vertex2(30, 90);
-        // let three = new Vertex2(80, 10);
-
-        function fun(x, y, angle) {
-            let _x = x - 50
-            let _y = y;
-            let _r = Math.sqrt(_x ** 2 + _y ** 2)
-            let _tan = Math.atan2(_y, _x);
-            let _angle = _tan + angle;
-            let _x2 = Math.cos(_angle) * _r;
-            let _y2 = Math.sin(_angle) * _r;
-            return { x: _x2 + 50, y: _y2 }
+      for (let x = 0; x < bufferWidth; x++) {
+        for (let y = 0; y < bufferHeight; y++) {
+          let pixel = zBuffer[x][y]
+          ctx.fillStyle = `rgb(${pixel.r},${pixel.g},${pixel.b})`;
+          ctx.fillRect(pixel.x, pixel.y, 1, 1)
         }
-
-        let tick = 0;
-        function render() {
-            zBuffer = [];
-            for (let x = 0; x < bufferWidth; x++) {
-                let col = []
-                for (let y = 0; y < bufferHeight; y++) {
-                    col.push(new Pixel(x, y, 0, 0, 0))
-                }
-                zBuffer.push(col)
-            }
+      }
 
 
+      tick++;
+    }
 
-
-            for (let index = 0; index < 12; index++) {
-
-                // if (index != 1) continue;
-                //let index = 1;
-                // if(index > 2) continue;
-
-
-
-
-                let one = triangles[index].vertexOne.getClone()
-                let two = triangles[index].vertexTwo.getClone()
-                let three = triangles[index].vertexThree.getClone()
-
-                let angle = tick / 10
-                let out = fun(one.x, one.z, angle);
-                one.x = out.x;
-                one.z = out.y;
-
-                out = fun(two.x, two.z, angle);
-                two.x = out.x;
-                two.z = out.y;
-
-                out = fun(three.x, three.z, angle)
-                three.x = out.x;
-                three.z = out.y;
-
-                let twoOne = two.getSubtract(one);
-                let threeOne = three.getSubtract(one);
-                let cross = twoOne.getCross(threeOne);
-                if (cross.z < 0)
-                    continue;
-
-
-                //Now account for perspective
-                // let _one = Math.abs(one.z-35);
-                // let _two = Math.abs(two.z - 35);
-                // let _three = Math.abs(three.z-35);
-                // one.x = (one.x - 50)/_one + 50
-                // one.y = (one.y - 50)/_one + 50
-                // two.x = (two.x - 50)/_two + 50
-                // two.y = (two.y - 50)/_two + 50
-                // three.x = (three.x - 50)/_three + 50
-                // three.y = (three.y - 50)/_three + 50
-
-
-
-                let a = new Vertex2(one.x, one.y);
-                let b = new Vertex2(two.x, two.y);
-                let c = new Vertex2(three.x, three.y);
-
-                let e1 = new Edge(a, b);
-                let e2 = new Edge(b, c);
-                let e3 = new Edge(c, a);
-
-                // let e1 = new Edge(one, two);
-                // let e2 = new Edge(two, three);
-                // let e3 = new Edge(three, one);
-
-                let pixels1 = e1.getPixels();
-                let pixels2 = e2.getPixels();
-                let pixels3 = e3.getPixels();
-
-
-
-                for (let pixel of pixels1) {
-                    let x = Math.max(0, pixel.x);
-                    let y = Math.max(0, pixel.y);
-                    zBuffer[x][y] = pixel;
-                }
-                for (let pixel of pixels2) {
-                    let x = Math.max(0, pixel.x);
-                    let y = Math.max(0, pixel.y);
-                    zBuffer[x][y] = pixel;
-                }
-                for (let pixel of pixels3) {
-                    let x = Math.max(0, pixel.x);
-                    let y = Math.max(0, pixel.y);
-                    zBuffer[x][y] = pixel;
-                }
-
-
-
-
-            }
-
-            // Draw the buffer
-
-            for (let x = 0; x < bufferWidth; x++) {
-                for (let y = 0; y < bufferHeight; y++) {
-                    let pixel = zBuffer[x][y]
-                    ctx.fillStyle = `rgb(${pixel.r},${pixel.g},${pixel.b})`;
-                    ctx.fillRect(pixel.x, pixel.y, 1, 1)
-                }
-            }
-
-
-            tick++;
-        }
-
-        setInterval(render, 100)
+    setInterval(render, 100)
 
 
 
 
 
-    </script>
+  </script>
 </body>
 
 </html>
