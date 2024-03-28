@@ -14,18 +14,27 @@
   <canvas id="canv">
 
   </canvas>
+  <!-- Place the classes in their own files -->
   <script src="Vertex2.js"></script>
   <script src="Vertex3.js"></script>
   <script src="Pixel.js"></script>
   <script src="Edge.js"></script>
   <script src="Triangle.js"></script>
-  <script src="monkey.js"></script>
+
+  <!-- Uncomment to use a specific model -->
+  <script src="cube.js"></script>
+  <!--<script src="sphere.js"></script> -->
+  <!-- <script src="monkey.js"></script> -->
+
+
   <script>
+    //Get a reference to the canvas we will draw to
     let canvas = document.querySelector("#canv");
     let ctx = canvas.getContext("2d")
     ctx.fillStyle = "red"
     ctx.fillRect(0, 0, 100, 100)
 
+    //Start parsing the obj file
     let lines = obj.split("\n")
     let vs = []
     let vns = []
@@ -34,28 +43,30 @@
 
     for (let i = 0; i < lines.length; i++) {
       let split = lines[i].trim().split(" ")
-      if (split[0] == "v") {
+      if (split[0] == "v") { //Handle vertex information
         let x = +split[1]
         let y = +split[2]
         let z = +split[3]
+
+        //We are scaling and shifting so our model is in the middle of the canvas
         // let v = new Vertex3(x , y , z)
         let v = new Vertex3(x * 30 + 50, y * 30 + 50, z * 30)
         vs.push(v)
       }
-      if (split[0] == "vn") {
+      if (split[0] == "vn") {//Handle normal information
         let x = +split[1]
         let y = +split[2]
         let z = +split[3]
         let vn = new Vertex3(x, y, z)
         vns.push(vn)
       }
-      if (split[0] == "vt") {
+      if (split[0] == "vt") {//Handle UV (texture) coordinate information
         let u = +split[1]
         let v = +split[2]
         let vt = new Vertex2(u, v)
         vts.push(vt)
       }
-      if (split[0] == "f") {
+      if (split[0] == "f") {//Handle information about each triangle
         let one = split[1]
         let two = split[2]
         let three = split[3]
@@ -78,6 +89,7 @@
         triangles.push(triangle)
       }
     }
+    //End obj parsing
 
 
     let zBuffer = []
@@ -96,8 +108,21 @@
       return { x: _x2 + 50, y: _y2 }
     }
 
-    let tick = 0;
+
+
+
+    let useAnimation = false;
+
+    /**
+     * Render the obj to the screen
+     */
     function render() {
+      
+      let usePerspective = false;
+      let useBackFaceCulling = false;
+      let useOneTriangle = true;
+
+      //First clear the zBuffer
       zBuffer = [];
       for (let x = 0; x < bufferWidth; x++) {
         let col = []
@@ -107,71 +132,73 @@
         zBuffer.push(col)
       }
 
-
-
-
+      //Loop over all the triangles
+      //And draw them to the screen
       for (let index = 0; index < triangles.length; index++) {
 
-        // if (index != 1) continue;
+        //Just show one triangle for debugging
+        if (useOneTriangle)
+          if (index != 1) continue;
 
+        //Get clones of the current triangle vertices
+        //so that we don't alter the original geometry
         let one = triangles[index].vertexOne.getClone()
         let two = triangles[index].vertexTwo.getClone()
         let three = triangles[index].vertexThree.getClone()
 
-        let angle = tick / 10
-        let out = rotate(one.x, one.z, angle);
-        one.x = out.x;
-        one.z = out.y;
+        //Update the rotation if we are doing a simple animation
+        if (useAnimation) {
+          let angle = tick / 10
 
-        out = rotate(two.x, two.z, angle);
-        two.x = out.x;
-        two.z = out.y;
+          let out = rotate(one.x, one.z, angle);
+          one.x = out.x;
+          one.z = out.y;
 
-        out = rotate(three.x, three.z, angle)
-        three.x = out.x;
-        three.z = out.y;
+          out = rotate(two.x, two.z, angle);
+          two.x = out.x;
+          two.z = out.y;
 
-        
+          out = rotate(three.x, three.z, angle)
+          three.x = out.x;
+          three.z = out.y;
+        }
 
+
+        //Setup the camera information for perspective calculations
         let cameraFromZ = 85
         let cameraToZ = 35
         let cameraLengthZ = cameraFromZ - cameraToZ
 
+        //Track the points once we do perspective
         let points = [one, two, three];
-        for(const point of points){
-          let distanceZ = cameraFromZ-point.z
-          let offsetX = point.x - 50;
-          let ratioX = offsetX/distanceZ;
-          let newValueX = ratioX * cameraLengthZ;
-          point.x = newValueX + 50
 
-          let offsetY = point.y - 50;
-          let ratioY = offsetY/distanceZ;
-          let newValueY = ratioY * cameraLengthZ;
-          point.y = newValueY + 50
+        //Loop over the points and apply perspective
+        if (usePerspective) {
+          for (const point of points) {
+            let distanceZ = cameraFromZ - point.z
+            let offsetX = point.x - 50;
+            let ratioX = offsetX / distanceZ;
+            let newValueX = ratioX * cameraLengthZ;
+            point.x = newValueX + 50
+
+            let offsetY = point.y - 50;
+            let ratioY = offsetY / distanceZ;
+            let newValueY = ratioY * cameraLengthZ;
+            point.y = newValueY + 50
+          }
         }
 
-        let twoOne = two.getSubtract(one);
-        let threeOne = three.getSubtract(one);
-        let cross = twoOne.getCross(threeOne);
-        if (cross.z < 0)
-          continue;
+        if (useBackFaceCulling) {
+          let twoOne = two.getSubtract(one);
+          let threeOne = three.getSubtract(one);
+          let cross = twoOne.getCross(threeOne);
+          if (cross.z < 0)
+            continue;
+        }
 
 
 
-        //Now account for perspective
-        // let _one = Math.abs(one.z-35);
-        // let _two = Math.abs(two.z - 35);
-        // let _three = Math.abs(three.z-35);
-        // one.x = (one.x - 50)/_one + 50
-        // one.y = (one.y - 50)/_one + 50
-        // two.x = (two.x - 50)/_two + 50
-        // two.y = (two.y - 50)/_two + 50
-        // three.x = (three.x - 50)/_three + 50
-        // three.y = (three.y - 50)/_three + 50
-
-
-
+        //Draw the triangle onto the zBuffer
         let a = new Vertex2(one.x, one.y);
         let b = new Vertex2(two.x, two.y);
         let c = new Vertex2(three.x, three.y);
@@ -180,15 +207,9 @@
         let e2 = new Edge(b, c);
         let e3 = new Edge(c, a);
 
-        // let e1 = new Edge(one, two);
-        // let e2 = new Edge(two, three);
-        // let e3 = new Edge(three, one);
-
         let pixels1 = e1.getPixels();
         let pixels2 = e2.getPixels();
         let pixels3 = e3.getPixels();
-
-
 
         for (let pixel of pixels1) {
           let x = Math.max(0, pixel.x);
@@ -205,10 +226,6 @@
           let y = Math.max(0, pixel.y);
           zBuffer[x][y] = pixel;
         }
-
-
-
-
       }
 
       // Draw the buffer
@@ -221,11 +238,22 @@
         }
       }
 
-
+      //Increment the tick for animation purposes
       tick++;
     }
 
-    setInterval(render, 100)
+    //Keep track of how many frames we have seen so that we can 
+    //do simple animation if we want.
+
+
+    let tick = 0;
+
+    if(useAnimation){
+      setInterval(render, 100)
+    }
+    else{
+      render()
+    }
 
 
 
