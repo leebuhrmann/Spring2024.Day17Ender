@@ -28,11 +28,11 @@ class Edge {
         let toReturn = [];
 
         let tangent = this.getNormalizedTangent();
-        let absX = Math.abs(tangent.x)
-        let absY = Math.abs(tangent.y)
+        let absX = Math.abs(tangent.x);
+        let absY = Math.abs(tangent.y);
         let m = Math.max(absX, absY);
         let inverse = 1 / m;
-        let offTangent = new Vertex2(tangent.x * inverse, tangent.y * inverse)
+        let offTangent = new Vertex2(tangent.x * inverse, tangent.y * inverse);
         let steps = this.getTangent().getLength() / offTangent.getLength();
 
         let x = startX;
