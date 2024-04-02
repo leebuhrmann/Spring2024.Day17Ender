@@ -26,7 +26,7 @@ class Vertex3 {
       return this.x * other.x + this.y * other.y + this.z * other.z;
   }
   getCross(other){
-    let x = this.y * other.z - this.z* other.y
+    let x = this.y * other.z - this.z * other.y;
     let y = this.z * other.x - this.x * other.z;
     let z = this.x * other.y - this.y * other.x;
     return new Vertex3(x, y, z);

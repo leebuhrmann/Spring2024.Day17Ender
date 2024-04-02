@@ -22,9 +22,9 @@
   <script src="Triangle.js"></script>
 
   <!-- Uncomment to use a specific model -->
-  <!-- <script src="cube.js"></script> -->
+  <script src="cube.js"></script>
   <!-- <script src="sphere.js"></script> -->
-  <script src="monkey.js"></script>
+  <!-- <script src="monkey.js"></script> -->
 
 
   <script>
@@ -118,16 +118,16 @@
 
 
 
-    let useAnimation = true;
+    let useAnimation = false;
 
     /**
      * Render the obj to the screen
      */
     function render() {
 
-      let usePerspective = true;
-      let useBackFaceCulling = true;
-      let useOneTriangle = false;
+      let usePerspective = false;
+      let useBackFaceCulling = false;
+      let useOneTriangle = true;
 
       //First clear the zBuffer
       zBuffer = [];
