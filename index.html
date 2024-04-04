@@ -227,8 +227,8 @@
 
         for (let y = minY; y <= maxY; y++) {
           let matching = allEdgePixels.filter(p => p.y == y);
-          let minX = Math.min(...matching.map(p => p.x))
-          let maxX = Math.max(...matching.map(p => p.x))
+          let minX = Math.min(...matching.map(p => p.x));
+          let maxX = Math.max(...matching.map(p => p.x));
           for (let x = minX; x <= maxX; x++) {
 
             //Now calculate the color
@@ -239,9 +239,9 @@
             let g = 255;
             let b = 255;
 
-            r *= diffuse
+            r *= diffuse;
             g *= diffuse;
-            b *= diffuse
+            b *= diffuse;
 
             let ambient = 50;
             r += ambient;

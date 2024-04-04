@@ -1,6 +1,6 @@
 /**
-         * This has to be counter clockwise
-         */
+ * This has to be counter clockwise
+ */
 class Triangle {
   constructor(vertexOne, vertexTwo, vertexThree) {
       this.vertexOne = vertexOne
